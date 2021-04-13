@@ -20,6 +20,9 @@ from regression.CacheCompanyTest import CacheCompanyTest
 from regression.ImportTerminalCalendarTest import ImportTerminalCalendarTest
 from regression.ImportTerminalMarketDataTest import ImportTerminalMarketDataTest
 from regression.ImportTerminalTradeTest import ImportTerminalTradeTest
+from regression.RunBasicRisksDefaultClosePdTest import RunBasicRisksDefaultClosePdTest
+from regression.RunEodMarketRiskByBookUnderlyerDefaultClosePdTest import \
+    RunEodMarketRiskByBookUnderlyerDefaultClosePdTest
 from regression.SyncTerminalInstrumentTest import SyncTerminalInstrumentTest
 from regression.UpdateAllVolSurfaceTest import UpdateAllVolSurfaceTest
 from regression.UpdateBCTInstrumentTest import UpdateBCTInstrumentTest
@@ -27,6 +30,7 @@ from regression.UpdateBCTQuoteTest import UpdateBCTQuoteTest
 from regression.UpdateCashflowTest import UpdateCashflowTest
 from regression.UpdateDaysInstrumentRealizedVolTest import UpdateDaysInstrumentRealizedVolTest
 from regression.UpdateEodOtcFutureContractTest import UpdateEodOtcFutureContractTest
+from regression.RunEodPositionDefaultClosePdTest import  RunEodPositionDefaultClosePdTest
 from regression.UpdateImpliedVolTest import UpdateImpliedVolTest
 from terminal.service import VolSurfaceService
 from trade_import.trade_import_fuc import trade_data_import
@@ -52,13 +56,13 @@ if __name__ == '__main__':
     eod_end_date = datetime.strptime(current_date, '%Y-%m-%d')
     eod_start_date = eod_end_date - timedelta(days=1)
     dump = False
-    #dump = True
+    # dump = True
     warm_up()
     test_suite = [
         ImportBCTCalendarTest(),
         ImportTerminalCalendarTest(),
         ImportTerminalMarketDataTest(eod_start_date, eod_end_date),
-        UpdateBCTInstrumentTest(),
+        UpdateBCTInstrumentTest(),    # todo: diff
         SyncTerminalInstrumentTest(),
         UpdateBCTQuoteTest(current_date),
         ImportBCTTradeTest(current_date),
@@ -66,21 +70,19 @@ if __name__ == '__main__':
         UpdateImpliedVolTest(eod_start_date, eod_end_date),
         UpdateEodOtcFutureContractTest(eod_start_date, eod_end_date),
         UpdateDaysInstrumentRealizedVolTest(eod_start_date.date(), eod_end_date.date()),
-        UpdateAllVolSurfaceTest(eod_start_date, eod_end_date),
+        # UpdateAllVolSurfaceTest(eod_start_date.date(), eod_end_date.date()),  # todo: diff
         CacheCompanyTest(),
         UpdateCashflowTest(),
         CacheInstrumentTypeTest(),
-        CacheOtcPositionTest(eod_end_date)
+        CacheOtcPositionTest(eod_end_date),
+        # RunBasicRisksDefaultClosePdTest(eod_end_date.date()),
+        RunEodPositionDefaultClosePdTest(current_date),   # 18. merge position and risk
+        # RunEodMarketRiskByBookUnderlyerDefaultClosePdTest()   # todo: 后台数据 None
     ]
     for test_case in test_suite:
         print(type(test_case))
         test_case.run(dump)
-    # # 17.run pv & greeks for all positions
-    # basic_risks_default_close_pd_run(eod_end_date.date())
-    # # 18. merge position and risk
-    # eod_position_default_close_pd_run(current_date)
-    # # 19. 各子公司分品种风险
-    # eod_market_risk_by_book_underlyer_default_close_pd_run(current_date)
+
     # # 20. 交易对手分品种风险报告
     # eod_counter_party_market_risk_by_underlyer_default_close_pd_run(current_date)
     # # 21. 交易对手风险报告

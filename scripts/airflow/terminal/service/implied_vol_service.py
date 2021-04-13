@@ -13,7 +13,8 @@ class ImpliedVolService:
 
     @staticmethod
     def calc_implied_vol(option_price, spot_price, strike_price, tau, r, q, option_type, product_type):
-        return ImpliedVolAlgo.calc_implied_vol(option_price, spot_price, strike_price, tau, r, q, option_type, product_type)
+        return ImpliedVolAlgo.calc_implied_vol(option_price, spot_price, strike_price, tau, r, q, option_type,
+                                               product_type)
 
     @staticmethod
     def get_official_vol_surface(db_session, instrument_id, valuation_date, strike_type, instance):
@@ -31,7 +32,7 @@ class ImpliedVolService:
         instrument_id = InstrumentService.get_primary_instrument_id(
             db_session, instrument_id, valuation_date, is_primary)
         vol_surface_dbo = VolSurfaceRepo.get_latest_vol_surface(db_session, instrument_id, valuation_date,
-                                                                    strike_type, instance)
+                                                                strike_type, instance)
         return ImpliedVolService.to_dto(vol_surface_dbo)
 
     @staticmethod
@@ -113,7 +114,7 @@ class ImpliedVolService:
 
         # fitting model
         fitting_model_schema = FittingModelSchema(many=True)
-        fitting_model_list =fitting_model_schema.load(dbo.fittingModels).data
+        fitting_model_list = fitting_model_schema.load(dbo.fittingModels).data
         dto.fittingModels = fitting_model_list
         dto.updatedAt = dbo.updatedAt
         return dto

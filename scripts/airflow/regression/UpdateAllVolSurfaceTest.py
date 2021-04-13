@@ -9,11 +9,11 @@ from regression.regression_tables import vol_surface
 # VolSurfaceService.update_all_vol_surface(eod_end_date.date(), eod_end_date.date(), 4)
 class UpdateAllVolSurfaceTest(RegressionTestCase):
     def __init__(self, eod_start_date, eod_end_date):
-        self.eod_start_date = eod_start_date,
+        self.eod_start_date = eod_start_date
         self.eod_end_date = eod_end_date
         self.result_tables = [
             vol_surface
         ]
 
     def test_run(self):
-        VolSurfaceService.update_all_vol_surface(self.eod_start_date, self.eod_end_date, 4)
+        VolSurfaceService.update_all_vol_surface(self.eod_start_date, self.eod_end_date, process_num=4)

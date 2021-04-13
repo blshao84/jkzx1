@@ -96,3 +96,12 @@ class RegressionRedisDictListResult(RegressionRedisResult):
     def to_dataframe(self, reg_result_encoded):
         reg_result = pd.read_msgpack(reg_result_encoded)
         return reg_result
+
+
+class RegressRedisJsonObjectListResult(RegressionRedisResult):
+    def __init__(self, name, keys, values, roundings={}):
+        super().__init__(name, keys, values, roundings)
+
+    def to_dataframe(self, reg_result_encoded):
+        reg_result = JSONDecoder().decode(bytes.decode(reg_result_encoded))
+        return pd.DataFrame(reg_result)

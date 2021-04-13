@@ -1,7 +1,7 @@
 from eod_pd import EOD_BASIC_SUB_COMPANIES_FROM_ORACLE, EOD_BASIC_INSTRUMENT_CONTRACT_TYPE, EOD_BASIC_POSITIONS, \
-    EOD_BASIC_POSITION_MAP
-from regression.RegressionResult import RegressionDBResult, RegressionRedisResult, RegressionRedisListResult, \
-    RegressionRedisDictResult, RegressionRedisDictListResult
+    EOD_BASIC_POSITION_MAP, EOD_BASIC_RISKS_, EOD_CUSTOM_POSITION_, PE_DEFAULT_CLOSE
+from regression.RegressionResult import RegressionDBResult, RegressionRedisListResult, \
+    RegressionRedisDictResult, RegressionRedisDictListResult, RegressRedisJsonObjectListResult
 
 bct_trading_holiday = RegressionDBResult(
     db_name='bct',
@@ -173,6 +173,18 @@ bct_otc_positions = RegressionRedisDictListResult(
     }
 )
 
+bct_otc_custom_postions = RegressRedisJsonObjectListResult(
+    name=EOD_CUSTOM_POSITION_ + PE_DEFAULT_CLOSE.lower(),
+    keys=['positionId'],
+    values=['bookName', 'partyName', 'tradeId', 'underlyerInstrumentId', 'productType',
+            'tradeDate', 'expirationDate', 'underlyerMultiplier', 'price', 'delta', 'gamma',
+            'vega', 'theta', 'message', 'underlyerPrice', 'r', 'q', 'vol', 'daysInYear', 'marketValue',
+            'number', 'deltaCash', 'gammaCash', 'rho', 'deltaDecay', 'deltaWithDecay', 'listedOption', 'pricingEnvironment'],
+    roundings={'underlyerMultiplier': 0, 'price': 4, 'gamma': 4, 'vega': 4, 'theta': 4, 'underlyerPrice': 4, 'r': 4,
+               'q': 4, 'vol': 4, 'daysInYear': 0, 'marketValue': 4, 'number': 4, 'deltaCash': 4, 'gammaCash': 4,
+               'rho': 4, 'deltaDecay': 4, 'deltaWithDecay': 4}
+)
+
 bct_otc_position_map = RegressionRedisDictListResult(
     name=EOD_BASIC_POSITION_MAP,
     keys=['tradeId'],
@@ -180,14 +192,14 @@ bct_otc_position_map = RegressionRedisDictListResult(
     roundings={'asset.underlyerMultiplier': 0}
 )
 
-future_contract_info = RegressionResultTable(
+future_contract_info = RegressionDBResult(
     db_name='terminal_data',
     name='market_data.future_contract_info',
     keys=['contract_type', 'trade_date'],
     values=['primary_contract_id', 'secondary_contract_id'],
 )
 
-terminal_realized_vol = RegressionResultTable(
+terminal_realized_vol = RegressionDBResult(
     db_name='terminal_data',
     name='market_data.realized_vol',
     keys=['instrument_id', 'valuation_date'],
@@ -195,9 +207,27 @@ terminal_realized_vol = RegressionResultTable(
     roundings={'vol': 2}
 )
 
-vol_surface = RegressionResultTable(
+vol_surface = RegressionDBResult(
     db_name='terminal_data',
     name='market_data.vol_surface',
-    keys=['instrument_id', 'valuation_date', 'instance'],
-    values=['model_info', 'fitting_model', 'strike_type', 'tag', 'tag'],
+    keys=['instrument_id', 'valuation_date'],
+    values=['instance', 'model_info', 'fitting_model', 'strike_type', 'tag', 'source'],
+)
+
+eod_basic_risks = RegressionRedisDictListResult(
+    name=EOD_BASIC_RISKS_ + "default_close",
+    keys=['underlyerInstrumentId'],
+    values=['baseContractDelta', 'baseContractGamma', 'baseContractPrice', 'baseContractRhoR', 'baseContractTheta',
+            'delta', 'gamma', 'price', 'q', 'quantity', 'r', 'rhoQ', 'rhoR', 'theta', 'underlyerForward',
+            'underlyerPrice', 'vega', 'vol', 'message', 'pricing_environment', 'qs', 'vols',
+            'underlyerPrices', 'deltas', 'gammas', 'vegas']
+)
+
+market_risk_by_sub_underlyer_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.market_risk_by_sub_underlyer_report',
+    keys=['book_name', 'underlyer_instrument_id', 'valuation_date'],
+    values=['delta', 'delta_cash', 'exfsid', 'gamma', 'gamma_cash', 'pricing_environment', 'report_name', 'rho',
+            'theta', 'vega'],
+    roundings={'delta': 4, 'delta_cash': 4, 'gamma': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
 )

@@ -236,13 +236,14 @@ class VolSurfaceService(object):
             vols['market'] = weighted_market_vol['vol_x_vega'] / weighted_market_vol['vega']
             vols.loc[vols['market'].isna().to_numpy(), 'market'] = vols['marked1']
             market_marked1_diff = vols['market'].to_numpy() - vols['marked1'].to_numpy()
-            vols['marked2'] = vols['marked1']\
-                + (1 - np.exp(-np.abs(market_marked1_diff / market_vol_shift_scale))) * market_marked1_diff
+            vols['marked2'] = vols['marked1'] \
+                              + (1 - np.exp(
+                -np.abs(market_marked1_diff / market_vol_shift_scale))) * market_marked1_diff
 
         variance = vols['marked2'].to_numpy() ** 2 * tenors_calendar / days_in_year
         for i in range(1, len(variance)):
-            if variance[i] < variance[i-1]:
-                variance[i] = variance[i-1]
+            if variance[i] < variance[i - 1]:
+                variance[i] = variance[i - 1]
         expiry_intervals = np.ediff1d(np.insert(tenors_calendar, 0, 0)) / days_in_year
         squared_local_vol = np.ediff1d(np.insert(variance, 0, 0)) / expiry_intervals
         smoothed_squared_local_vol = np.concatenate(
@@ -363,7 +364,6 @@ class VolSurfaceService(object):
             logging.error(e)
         finally:
             session.close()
-
 
 # if __name__ == '__main__':
 #     # mark fair vol

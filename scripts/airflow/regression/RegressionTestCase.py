@@ -11,7 +11,7 @@ logging = Logging.getLogger(__name__)
 
 
 def write_to_csv(name, data):
-    file_name = name + '.csv'
+    file_name = name.replace(':', '_') + '.csv'
     keys = data[0].keys()
     logging.info('write data to csv file %s' % file_name)
     with open(file_name, 'w', newline='', encoding='utf8') as output_file:
@@ -68,11 +68,10 @@ def db_to_record(tbl):
 
 def file_to_record(path):
     # get file's encoding
-    tmpfile = open(path, mode='rb')
-    data = tmpfile.read()
+    tmp_file = open(path, mode='rb')
+    data = tmp_file.read()
     encoding = chardet.detect(data)["encoding"]
-    logging.info('file:%s encoding is %s' % (tmpfile.name, encoding))
-
+    logging.info('file:%s encoding is %s' % (tmp_file.name, encoding))
     with open(path, encoding=encoding) as f:
         rows = [{k: v for k, v in row.items()}
                 for row in csv.DictReader(f, skipinitialspace=True)]
@@ -81,7 +80,7 @@ def file_to_record(path):
 
 def bas_to_record(test_name, table_name):
     cur_path = os.path.dirname(os.path.realpath(__file__))
-    path = os.path.join(cur_path, 'bas', test_name, table_name + '.csv')
+    path = os.path.join(cur_path, 'bas', test_name, table_name.replace(':', '_') + '.csv')
     rows = file_to_record(path)
     return table_name, rows
 
