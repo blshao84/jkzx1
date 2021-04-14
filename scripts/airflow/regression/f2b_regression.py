@@ -75,7 +75,7 @@ if __name__ == '__main__':
         UpdateCashflowTest(),
         CacheInstrumentTypeTest(),
         CacheOtcPositionTest(eod_end_date),
-        # RunBasicRisksDefaultClosePdTest(eod_end_date.date()),
+        RunBasicRisksDefaultClosePdTest(eod_end_date.date()),
         RunEodPositionDefaultClosePdTest(current_date),   # 18. merge position and risk
         # RunEodMarketRiskByBookUnderlyerDefaultClosePdTest()   # todo: 后台数据 None
     ]
