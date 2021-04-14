@@ -121,17 +121,19 @@ class RegressionTestCase:
                                      list(map(lambda k: k.replace('"', ''), tbl.key_columns))),
                         self.result_tables))
 
-    def run(self, dump: bool):
+    def run(self, dump: bool, dry_run=False):
         self.test_run()
-        if dump:
-            self.dump_result()
-        else:
-            bas = self.bas_result()
-            reg = self.reg_result()
-            keys_map = self.table_keys()
-            for bas_name in bas:
-                bas_values = bas[bas_name]
-                keys = keys_map[bas_name]
-                reg_values = reg[bas_name]
-                diff = csvdiff.diff_records(bas_values, reg_values, keys)
-                assert_results(diff, bas_name)
+        if not dry_run:
+            if dump:
+                self.dump_result()
+            else:
+                bas = self.bas_result()
+                reg = self.reg_result()
+                keys_map = self.table_keys()
+                for bas_name in bas:
+                    bas_values = bas[bas_name]
+                    keys = keys_map[bas_name]
+                    reg_values = reg[bas_name]
+                    diff = csvdiff.diff_records(bas_values, reg_values, keys)
+                    assert_results(diff, bas_name)
+

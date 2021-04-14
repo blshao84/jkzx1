@@ -10,7 +10,7 @@ from eod_pd import basic_otc_company_type_run, basic_cash_flow_pd_run, basic_cas
     eod_market_risk_by_book_underlyer_default_close_pd_run, \
     eod_counter_party_market_risk_by_underlyer_default_close_pd_run, eod_counter_party_market_risk_default_close_pd_run, \
     eod_subsidiary_market_risk_default_close_pd_run, eod_market_risk_summary_default_close_pd_run, \
-    eod_market_risk_detail_default_close_pd_run
+    eod_market_risk_detail_default_close_pd_run, eod_spot_scenarios_by_market_default_close_pd_run
 from market_data.eod_market_data import *
 from regression.CacheInstrumentTypeTest import CacheInstrumentTypeTest
 from regression.CacheOtcPositionTest import CacheOtcPositionTest
@@ -63,6 +63,7 @@ if __name__ == '__main__':
     current_date = '2020-08-27'
     eod_end_date = datetime.strptime(current_date, '%Y-%m-%d')
     eod_start_date = eod_end_date - timedelta(days=1)
+    dry_run = False
     dump = False
     # dump = True
     warm_up()
@@ -93,8 +94,6 @@ if __name__ == '__main__':
     ]
     for test_case in test_suite:
         print(type(test_case))
-        test_case.run(dump)
-    # # 23. 全市场整体风险汇总报告
-    # eod_market_risk_summary_default_close_pd_run(current_date)
+        test_case.run(dump, dry_run)
     # # 24. 全市场分品种风险报告
     # eod_market_risk_detail_default_close_pd_run(current_date)
