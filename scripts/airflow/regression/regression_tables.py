@@ -274,3 +274,10 @@ market_risk_detail_report = RegressionDBResult(
     roundings={'delta': 4, 'delta_cash': 4, 'gamma': 4, 'gamma_cash': 4, 'pnl_change': 4, 'rho': 4, 'theta': 4,
                'vega': 4}
 )
+
+spot_scenarios_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.spot_scenarios_report',
+    keys=['content_name', 'instrument_id', 'report_type', 'valuation_date'],
+    values=['asset_class', 'exfsid', 'instrument_type', 'report_name', 'scenarios'],
+)
