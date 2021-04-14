@@ -264,3 +264,13 @@ market_risk_report = RegressionDBResult(
     values=['delta_cash', 'gamma_cash', 'rho', 'theta', 'vega'],
     roundings={'delta_cash': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
 )
+
+market_risk_detail_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.market_risk_detail_report',
+    keys=['report_name', 'underlyer_instrument_id', 'valuation_date'],
+    values=['delta', 'delta_cash', 'exfsid', 'gamma', 'gamma_cash', 'party_name', 'pnl_change', 'report_type', 'rho',
+            'scenario_name', 'scenario_type', 'subsidiary', 'theta', 'vega'],
+    roundings={'delta': 4, 'delta_cash': 4, 'gamma': 4, 'gamma_cash': 4, 'pnl_change': 4, 'rho': 4, 'theta': 4,
+               'vega': 4}
+)
