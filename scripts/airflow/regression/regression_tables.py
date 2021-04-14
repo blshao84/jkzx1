@@ -232,6 +232,14 @@ market_risk_by_sub_underlyer_report = RegressionDBResult(
     roundings={'delta': 4, 'delta_cash': 4, 'gamma': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
 )
 
+counter_party_market_risk_by_underlyer_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.counter_party_market_risk_by_underlyer_report',
+    keys=['party_name', 'underlyer_instrument_id', 'valuation_date'],
+    values=['delta', 'delta_cash', 'exfsid', 'gamma', 'gamma_cash', 'report_name', 'rho', 'theta', 'vega'],
+    roundings={'delta': 4, 'delta_cash': 4, 'gamma': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
+)
+
 counter_party_market_risk_report = RegressionDBResult(
     db_name='bct',
     name='report_service.counter_party_market_risk_report',
