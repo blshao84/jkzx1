@@ -30,7 +30,7 @@ from regression.UpdateBCTQuoteTest import UpdateBCTQuoteTest
 from regression.UpdateCashflowTest import UpdateCashflowTest
 from regression.UpdateDaysInstrumentRealizedVolTest import UpdateDaysInstrumentRealizedVolTest
 from regression.UpdateEodOtcFutureContractTest import UpdateEodOtcFutureContractTest
-from regression.RunEodPositionDefaultClosePdTest import  RunEodPositionDefaultClosePdTest
+from regression.RunEodPositionDefaultClosePdTest import RunEodPositionDefaultClosePdTest
 from regression.UpdateImpliedVolTest import UpdateImpliedVolTest
 from terminal.service import VolSurfaceService
 from trade_import.trade_import_fuc import trade_data_import
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         ImportBCTCalendarTest(),
         ImportTerminalCalendarTest(),
         ImportTerminalMarketDataTest(eod_start_date, eod_end_date),
-        UpdateBCTInstrumentTest(),    # todo: diff
+        UpdateBCTInstrumentTest(),
         SyncTerminalInstrumentTest(),
         UpdateBCTQuoteTest(current_date),
         ImportBCTTradeTest(current_date),
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         CacheOtcPositionTest(eod_end_date),
         RunBasicRisksDefaultClosePdTest(eod_end_date.date()),
         RunEodPositionDefaultClosePdTest(current_date),   # 18. merge position and risk
-        # RunEodMarketRiskByBookUnderlyerDefaultClosePdTest()   # todo: 后台数据 None
+        RunEodMarketRiskByBookUnderlyerDefaultClosePdTest(current_date)  # 19. 各子公司分品种风险
     ]
     for test_case in test_suite:
         print(type(test_case))
