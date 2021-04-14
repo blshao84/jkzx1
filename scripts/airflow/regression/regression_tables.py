@@ -256,3 +256,11 @@ subsidiary_market_risk_report = RegressionDBResult(
     values=['delta_cash', 'gamma_cash', 'report_name', 'rho', 'theta', 'vega'],
     roundings={'delta_cash': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
 )
+
+market_risk_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.market_risk_report',
+    keys=['pricing_environment', 'report_name', 'valuation_date'],
+    values=['delta_cash', 'gamma_cash', 'rho', 'theta', 'vega'],
+    roundings={'delta_cash': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
+)
