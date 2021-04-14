@@ -32,6 +32,7 @@ from regression.UpdateDaysInstrumentRealizedVolTest import UpdateDaysInstrumentR
 from regression.UpdateEodOtcFutureContractTest import UpdateEodOtcFutureContractTest
 from regression.RunEodPositionDefaultClosePdTest import  RunEodPositionDefaultClosePdTest
 from regression.UpdateImpliedVolTest import UpdateImpliedVolTest
+from regression.RunEodCounterpartyMarketRiskDefaultCloseDdTest import RunEodCounterpartyMarketRiskDefaultCloseDdTest
 from terminal.service import VolSurfaceService
 from trade_import.trade_import_fuc import trade_data_import
 
@@ -77,7 +78,8 @@ if __name__ == '__main__':
         CacheOtcPositionTest(eod_end_date),  #16
         RunBasicRisksDefaultClosePdTest(eod_end_date.date()),  #17
         RunEodPositionDefaultClosePdTest(current_date),   # 18. merge position and risk
-        RunEodMarketRiskByBookUnderlyerDefaultClosePdTest(current_date)  # 19
+        RunEodMarketRiskByBookUnderlyerDefaultClosePdTest(current_date),  # 19
+        RunEodCounterpartyMarketRiskDefaultCloseDdTest(current_date)   #21 交易对手风险报告
     ]
     for test_case in test_suite:
         print(type(test_case))
@@ -85,8 +87,6 @@ if __name__ == '__main__':
 
     # # 20. 交易对手分品种风险报告
     # eod_counter_party_market_risk_by_underlyer_default_close_pd_run(current_date)
-    # # 21. 交易对手风险报告
-    # eod_counter_party_market_risk_default_close_pd_run(current_date)
     # # 22. 各子公司整体风险报告
     # eod_subsidiary_market_risk_default_close_pd_run(current_date)
     # # 23. 全市场整体风险汇总报告
