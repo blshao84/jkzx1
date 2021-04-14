@@ -179,7 +179,8 @@ bct_otc_custom_postions = RegressRedisJsonObjectListResult(
     values=['bookName', 'partyName', 'tradeId', 'underlyerInstrumentId', 'productType',
             'tradeDate', 'expirationDate', 'underlyerMultiplier', 'price', 'delta', 'gamma',
             'vega', 'theta', 'message', 'underlyerPrice', 'r', 'q', 'vol', 'daysInYear', 'marketValue',
-            'number', 'deltaCash', 'gammaCash', 'rho', 'deltaDecay', 'deltaWithDecay', 'listedOption', 'pricingEnvironment'],
+            'number', 'deltaCash', 'gammaCash', 'rho', 'deltaDecay', 'deltaWithDecay', 'listedOption',
+            'pricingEnvironment'],
     roundings={'underlyerMultiplier': 0, 'price': 4, 'gamma': 4, 'vega': 4, 'theta': 4, 'underlyerPrice': 4, 'r': 4,
                'q': 4, 'vol': 4, 'daysInYear': 0, 'marketValue': 4, 'number': 4, 'deltaCash': 4, 'gammaCash': 4,
                'rho': 4, 'deltaDecay': 4, 'deltaWithDecay': 4}
@@ -245,5 +246,13 @@ counter_party_market_risk_report = RegressionDBResult(
     name='report_service.counter_party_market_risk_report',
     keys=['party_name', 'report_name', 'valuation_date'],
     values=['delta_cash', 'gamma_cash', 'rho', 'theta', 'vega'],
+    roundings={'delta_cash': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
+)
+
+subsidiary_market_risk_report = RegressionDBResult(
+    db_name='bct',
+    name='report_service.subsidiary_market_risk_report',
+    keys=['subsidiary', 'valuation_date'],
+    values=['delta_cash', 'gamma_cash', 'report_name', 'rho', 'theta', 'vega'],
     roundings={'delta_cash': 4, 'gamma_cash': 4, 'rho': 4, 'theta': 4, 'vega': 4}
 )

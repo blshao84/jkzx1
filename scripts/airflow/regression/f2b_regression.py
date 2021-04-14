@@ -25,6 +25,7 @@ from regression.RunEodCounterPartyMarketRiskByUnderlyerDefaultClosePd import \
     RunEodCounterPartyMarketRiskByUnderlyerDefaultClosePd
 from regression.RunEodMarketRiskByBookUnderlyerDefaultClosePdTest import \
     RunEodMarketRiskByBookUnderlyerDefaultClosePdTest
+from regression.RunEodSubsidiaryMarketRiskDefaultClosePd import RunEodSubsidiaryMarketRiskDefaultClosePd
 from regression.SyncTerminalInstrumentTest import SyncTerminalInstrumentTest
 from regression.UpdateAllVolSurfaceTest import UpdateAllVolSurfaceTest
 from regression.UpdateBCTInstrumentTest import UpdateBCTInstrumentTest
@@ -32,7 +33,7 @@ from regression.UpdateBCTQuoteTest import UpdateBCTQuoteTest
 from regression.UpdateCashflowTest import UpdateCashflowTest
 from regression.UpdateDaysInstrumentRealizedVolTest import UpdateDaysInstrumentRealizedVolTest
 from regression.UpdateEodOtcFutureContractTest import UpdateEodOtcFutureContractTest
-from regression.RunEodPositionDefaultClosePdTest import  RunEodPositionDefaultClosePdTest
+from regression.RunEodPositionDefaultClosePdTest import RunEodPositionDefaultClosePdTest
 from regression.UpdateImpliedVolTest import UpdateImpliedVolTest
 from regression.RunEodCounterpartyMarketRiskDefaultCloseDdTest import RunEodCounterpartyMarketRiskDefaultCloseDdTest
 from terminal.service import VolSurfaceService
@@ -62,38 +63,32 @@ if __name__ == '__main__':
     # dump = True
     warm_up()
     test_suite = [
-        ImportBCTCalendarTest(),  #1
-        ImportTerminalCalendarTest(),  #2
-        ImportTerminalMarketDataTest(eod_start_date, eod_end_date),  #3
-        UpdateBCTInstrumentTest(),      #4
-        SyncTerminalInstrumentTest(),   #5
-        UpdateBCTQuoteTest(current_date),  #6
-        ImportBCTTradeTest(current_date),   #7
-        ImportTerminalTradeTest(eod_start_date, eod_end_date),  #8
-        UpdateImpliedVolTest(eod_start_date, eod_end_date),  #9
-        UpdateEodOtcFutureContractTest(eod_start_date, eod_end_date),  #10
-        UpdateDaysInstrumentRealizedVolTest(eod_start_date.date(), eod_end_date.date()),  #11
-        # UpdateAllVolSurfaceTest(eod_start_date.date(), eod_end_date.date()),  # 12 todo: diff
-        CacheCompanyTest(),  # 13.1
-        UpdateCashflowTest(),  # 13.2
-        CacheInstrumentTypeTest(),  # 15
-        CacheOtcPositionTest(eod_end_date),  # 16
-        RunBasicRisksDefaultClosePdTest(eod_end_date.date()),  # 17
-        RunEodPositionDefaultClosePdTest(current_date),  # 18. merge position and risk
-        RunEodMarketRiskByBookUnderlyerDefaultClosePdTest(current_date),  # 19
-        RunEodCounterPartyMarketRiskByUnderlyerDefaultClosePd(current_date),  # 20. 交易对手分品种风险报告
-        RunEodCounterpartyMarketRiskDefaultCloseDdTest(current_date)  # 21 交易对手风险报告
+        # ImportBCTCalendarTest(),  # 1
+        # ImportTerminalCalendarTest(),  # 2
+        # ImportTerminalMarketDataTest(eod_start_date, eod_end_date),  # 3
+        # UpdateBCTInstrumentTest(),  # 4
+        # SyncTerminalInstrumentTest(),  # 5
+        # UpdateBCTQuoteTest(current_date),  # 6
+        # ImportBCTTradeTest(current_date),  # 7
+        # ImportTerminalTradeTest(eod_start_date, eod_end_date),  # 8
+        # UpdateImpliedVolTest(eod_start_date, eod_end_date),  # 9
+        # UpdateEodOtcFutureContractTest(eod_start_date, eod_end_date),  # 10
+        # UpdateDaysInstrumentRealizedVolTest(eod_start_date.date(), eod_end_date.date()),  # 11
+        # # UpdateAllVolSurfaceTest(eod_start_date.date(), eod_end_date.date()),  # 12 todo: diff
+        # CacheCompanyTest(),  # 13.1
+        # UpdateCashflowTest(),  # 13.2
+        # CacheInstrumentTypeTest(),  # 15
+        # CacheOtcPositionTest(eod_end_date),  # 16
+        # RunBasicRisksDefaultClosePdTest(eod_end_date.date()),  # 17
+        # RunEodPositionDefaultClosePdTest(current_date),  # 18. merge position and risk
+        # RunEodMarketRiskByBookUnderlyerDefaultClosePdTest(current_date),  # 19
+        # RunEodCounterPartyMarketRiskByUnderlyerDefaultClosePd(current_date),  # 20. 交易对手分品种风险报告
+        # RunEodCounterpartyMarketRiskDefaultCloseDdTest(current_date),  # 21 交易对手风险报告
+        RunEodSubsidiaryMarketRiskDefaultClosePd(current_date)  # 22. 各子公司整体风险报告
     ]
     for test_case in test_suite:
         print(type(test_case))
         test_case.run(dump)
-
-    # # 20. 交易对手分品种风险报告
-    # eod_counter_party_market_risk_by_underlyer_default_close_pd_run(current_date)
-    # # 21. 交易对手风险报告
-    # eod_counter_party_market_risk_default_close_pd_run(current_date)
-    # # 22. 各子公司整体风险报告
-    # eod_subsidiary_market_risk_default_close_pd_run(current_date)
     # # 23. 全市场整体风险汇总报告
     # eod_market_risk_summary_default_close_pd_run(current_date)
     # # 24. 全市场分品种风险报告
