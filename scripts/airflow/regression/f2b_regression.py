@@ -81,7 +81,7 @@ if __name__ == '__main__':
         UpdateImpliedVolTest(eod_start_date, eod_end_date),  # 9
         UpdateEodOtcFutureContractTest(eod_start_date, eod_end_date),  # 10
         UpdateDaysInstrumentRealizedVolTest(eod_start_date.date(), eod_end_date.date()),  # 11
-        # UpdateAllVolSurfaceTest(eod_start_date.date(), eod_end_date.date()),  # 12 todo: diff
+        UpdateAllVolSurfaceTest(eod_start_date.date(), eod_end_date.date()),  # 12
         CacheCompanyTest(),  # 13.1
         UpdateCashflowTest(),  # 13.2
         CacheInstrumentTypeTest(),  # 15
