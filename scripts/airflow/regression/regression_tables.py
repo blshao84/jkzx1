@@ -282,4 +282,6 @@ spot_scenarios_report = RegressionDBResult(
     name='report_service.spot_scenarios_report',
     keys=['content_name', 'instrument_id', 'report_type', 'valuation_date'],
     values=['asset_class', 'exfsid', 'instrument_type', 'report_name', 'scenarios'],
+    roundings={'scenarios.delta': 4, 'scenarios.deltaCash': 4, 'scenarios.gamma': 4, 'scenarios.gammaCash': 4,
+               'scenarios.theta': 4, 'scenarios.vega': 4, 'scenarios.rhoR': 4, 'scenarios.pnlChange': 4}
 )
