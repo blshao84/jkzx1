@@ -2,6 +2,8 @@ from ast import literal_eval
 
 import csvdiff
 from csvdiff import patch
+from pandas import DataFrame
+from tabulate import tabulate
 
 from dags.service.vol_surface_service import VolSurfaceService
 from regression.RegressionTestCase import RegressionTestCase, assert_results
@@ -34,13 +36,13 @@ class UpdateAllVolSurfaceTest(RegressionTestCase):
                     bas_values = bas[bas_name]
                     keys = keys_map[bas_name]
                     reg_values = reg[bas_name]
-                    diff = csvdiff.diff_records(list(map(self.convert, bas_values)),
-                                                list(map(self.convert, reg_values)), keys)
+                    diff = csvdiff.diff_records(list(map(self.convert_model_info, bas_values)),
+                                                list(map(self.convert_model_info, reg_values)), keys)
                     assert_results(diff, bas_name)
                     diff = patch.create(bas_values, reg_values, keys, ignore_columns=['model_info'])
                     assert_results(diff, bas_name)
 
-    def convert(self, value):
+    def convert_model_info(self, value):
         value_dict = {}
         for key in self.table_keys()['market_data.vol_surface']:
             value_dict[key] = value.get(key)
@@ -50,4 +52,23 @@ class UpdateAllVolSurfaceTest(RegressionTestCase):
             value_dict.update(model_info[0])
         else:
             value_dict.update(model_info)
+
+        roundings = {}
+        for k, v in vol_surface.roundings.items():
+            if k.startswith('model_info.'):
+                roundings[k.replace('model_info.', '')] = v
+        for k, v in roundings.items():
+            self.dfs(value_dict, k.split('.'), 0, v)
         return value_dict
+
+    def dfs(self, obj, keys, key_idx, rounding):
+        key = keys[key_idx]
+        if key_idx == len(keys) - 1:
+            obj[key] = round(obj[key], rounding)
+            return
+
+        if type(obj[key]) == list:
+            for item in obj[key]:
+                self.dfs(item, keys, key_idx + 1, rounding)
+        else:
+            self.dfs(obj[key], keys, key_idx + 1, rounding)

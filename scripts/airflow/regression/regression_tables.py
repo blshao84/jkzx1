@@ -213,6 +213,7 @@ vol_surface = RegressionDBResult(
     name='market_data.vol_surface',
     keys=['instrument_id', 'valuation_date'],
     values=['instance', 'model_info', 'fitting_model', 'strike_type', 'tag', 'source'],
+    roundings={"model_info.instruments.vols.quote": 4}
 )
 
 eod_basic_risks = RegressionRedisDictListResult(
