@@ -29,7 +29,7 @@ class VolSurfaceService:
     def to_dbo(vol_surface_dto):
         logging.debug("%s转成dbo中..." % vol_surface_dto.instrumentId)
         vol_surface_dbo = std.VolSurface()
-        vol_surface_dbo.uuid = uuid.uuid1()
+        vol_surface_dbo.uuid = uuid.uuid4()
         # 增加ci run的日志
         logging.info("%s转成dbo中, UUID: %s ..." % (vol_surface_dto.instrumentId, vol_surface_dbo.uuid))
         vol_surface_dbo.instrumentId = vol_surface_dto.instrumentId
