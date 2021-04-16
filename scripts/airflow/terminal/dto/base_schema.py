@@ -1,6 +1,7 @@
 from marshmallow import Schema, fields, post_load, pre_load
 import re
 
+
 class BaseSchema(Schema):
     def camel(self, match):
         return match[1][1].upper().upper()
@@ -22,11 +23,10 @@ class BaseSchema(Schema):
                 new_dict[self.convert_snake_string(key)] = val
         return new_dict
 
+    # @pre_load
+    # def pre(self, data):
+    #     return self.convert_snake_case_keys(data)
+
     @pre_load
-    def pre(self, data):
+    def pre(self, data, many=None, partial=None):
         return self.convert_snake_case_keys(data)
-
-
-    # def xload(self, data, many=None, partial=None):
-    #     data = self.convert_snake_case_keys(data)
-    #     return super().load(data, many=None, partial=None)
