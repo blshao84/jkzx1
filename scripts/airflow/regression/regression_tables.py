@@ -222,7 +222,8 @@ eod_basic_risks = RegressionRedisDictListResult(
     values=['baseContractDelta', 'baseContractGamma', 'baseContractPrice', 'baseContractRhoR', 'baseContractTheta',
             'delta', 'gamma', 'price', 'q', 'quantity', 'r', 'rhoQ', 'rhoR', 'theta', 'underlyerForward',
             'underlyerPrice', 'vega', 'vol', 'message', 'pricing_environment', 'qs', 'vols',
-            'underlyerPrices', 'deltas', 'gammas', 'vegas']
+            'underlyerPrices', 'deltas', 'gammas', 'vegas'],
+    roundings={'gamma': 4, 'price': 4, 'rhoR': 4, 'theta': 4, 'vol': 4}
 )
 
 market_risk_by_sub_underlyer_report = RegressionDBResult(
