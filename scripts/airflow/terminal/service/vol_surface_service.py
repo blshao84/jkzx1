@@ -1,8 +1,8 @@
 from terminal.dao import OptionStructureRepo, WingModelRepo, QuoteCloseRepo, \
     TradingCalendarRepo, InstrumentRepo, VolSurfaceRepo
-from terminal.dto import OptionStructureDTO, SpotDTO, VolSurfaceUnderlyerDTO,\
-    VolGridItemDTO, VolItemDTO, VolSurfaceDTO, VolSurfaceModelInfoDTO, FittingModelDTO,\
-    VolSurfaceUnderlyerSchema, FittingModelSchema, VolSurfaceModelInfoSchema, FittingModelStrikeType,\
+from terminal.dto import OptionStructureDTO, SpotDTO, VolSurfaceUnderlyerDTO, \
+    VolGridItemDTO, VolItemDTO, VolSurfaceDTO, VolSurfaceModelInfoDTO, FittingModelDTO, \
+    VolSurfaceUnderlyerSchema, FittingModelSchema, VolSurfaceModelInfoSchema, FittingModelStrikeType, \
     OptionTradedType, InstanceType, VolSurfaceStrikeType, FutureContractOrder, InstrumentType, AssetClassType
 from terminal.utils import Logging
 from terminal.utils.datetime_utils import DateTimeUtils
@@ -29,7 +29,9 @@ class VolSurfaceService:
     def to_dbo(vol_surface_dto):
         logging.debug("%s转成dbo中..." % vol_surface_dto.instrumentId)
         vol_surface_dbo = std.VolSurface()
-        vol_surface_dbo.uuid = uuid.uuid1()
+        vol_surface_dbo.uuid = uuid.uuid4()
+        # 增加ci run的日志
+        logging.info("%s转成dbo中, UUID: %s ..." % (vol_surface_dto.instrumentId, vol_surface_dbo.uuid))
         vol_surface_dbo.instrumentId = vol_surface_dto.instrumentId
         vol_surface_dbo.valuationDate = vol_surface_dto.valuationDate
         vol_surface_dbo.strikeType = vol_surface_dto.strikeType
@@ -38,20 +40,24 @@ class VolSurfaceService:
         vol_surface_dbo.tag = vol_surface_dto.tag
         vol_surface_dbo.updatedAt = datetime.now()
         vol_surface_model_info = VolSurfaceModelInfoSchema()
-        vol_surface_dbo.modelInfo = vol_surface_model_info.dump(vol_surface_dto.modelInfo).data
+        vol_surface_dbo.modelInfo = vol_surface_model_info.dump(vol_surface_dto.modelInfo)
         vol_surface_fitting_models = FittingModelSchema(many=True)
-        vol_surface_dbo.fittingModels = vol_surface_fitting_models.dump(vol_surface_dto.fittingModels).data
+        vol_surface_dbo.fittingModels = vol_surface_fitting_models.dump(vol_surface_dto.fittingModels)
         return vol_surface_dbo
 
     @staticmethod
     def calc_instrument_fitting_model(db_session, instrument_obj, trade_date, strike_type):
         strike_type = FittingModelStrikeType.valueOf(strike_type)
         instrument = instrument_obj.instrumentId
-        if (instrument_obj.optionTradedType == OptionTradedType.OTC.name and instrument_obj.assetClass == AssetClassType.EQUITY.name and instrument_obj.instrumentType == InstrumentType.STOCK.name)\
-                or (instrument_obj.instrumentType == InstrumentType.FUTURE.name and instrument_obj.optionTradedType == OptionTradedType.OTC.name and instrument_obj.assetClass == AssetClassType.COMMODITY.name):
-            vol_surface_dto = OtcModelService.calc_instrument_otc_implied_vol_points(db_session, instrument, trade_date, strike_type)
+        if (
+                instrument_obj.optionTradedType == OptionTradedType.OTC.name and instrument_obj.assetClass == AssetClassType.EQUITY.name and instrument_obj.instrumentType == InstrumentType.STOCK.name) \
+                or (
+                instrument_obj.instrumentType == InstrumentType.FUTURE.name and instrument_obj.optionTradedType == OptionTradedType.OTC.name and instrument_obj.assetClass == AssetClassType.COMMODITY.name):
+            vol_surface_dto = OtcModelService.calc_instrument_otc_implied_vol_points(db_session, instrument, trade_date,
+                                                                                     strike_type)
         elif instrument_obj.instrumentType == InstrumentType.FUND.name:
-            vol_surface_dto = WingModelService.calc_fund_vol_surface(db_session, instrument, trade_date, strike_type=strike_type)
+            vol_surface_dto = WingModelService.calc_fund_vol_surface(db_session, instrument, trade_date,
+                                                                     strike_type=strike_type)
             vol_surface_dto.instrumentId = instrument
             vol_surface_dto.valuationDate = trade_date
             vol_surface_dto.instance = InstanceType.INTRADAY.name
@@ -60,10 +66,13 @@ class VolSurfaceService:
             underlyer = VolSurfaceUnderlyerDTO()
             underlyer.instance = InstanceType.INTRADAY.name
             underlyer.instrumentId = instrument
-            underlyer.quote = QuoteCloseRepo.get_instrument_quote_close_list_by_period(db_session, instrument, trade_date, trade_date)[0].closePrice
+            underlyer.quote = \
+            QuoteCloseRepo.get_instrument_quote_close_list_by_period(db_session, instrument, trade_date, trade_date)[
+                0].closePrice
             vol_surface_dto.modelInfo.underlyer = underlyer
         elif instrument_obj.instrumentType == InstrumentType.FUTURE.name and instrument_obj.assetClass == AssetClassType.COMMODITY.name and instrument_obj.optionTradedType == OptionTradedType.EXCHANGE_TRADED.name:
-            vol_surface_dto = WingModelService.calc_commodity_vol_surface(db_session, instrument_obj.contractType, trade_date, strike_type=strike_type)
+            vol_surface_dto = WingModelService.calc_commodity_vol_surface(db_session, instrument_obj.contractType,
+                                                                          trade_date, strike_type=strike_type)
             vol_surface_dto.instrumentId = instrument
             vol_surface_dto.valuationDate = trade_date
             vol_surface_dto.instance = InstanceType.INTRADAY.name
@@ -71,7 +80,9 @@ class VolSurfaceService:
             underlyer = VolSurfaceUnderlyerDTO()
             underlyer.instance = InstanceType.INTRADAY.name
             underlyer.instrumentId = instrument
-            underlyer.quote = QuoteCloseRepo.get_instrument_quote_close_list_by_period(db_session, instrument, trade_date, trade_date)[0].closePrice
+            underlyer.quote = \
+            QuoteCloseRepo.get_instrument_quote_close_list_by_period(db_session, instrument, trade_date, trade_date)[
+                0].closePrice
             vol_surface_dto.modelInfo.underlyer = underlyer
 
         elif instrument_obj.instrumentType == InstrumentType.OPTION.name or InstrumentType.INDEX.name:
@@ -88,7 +99,9 @@ class OtcModelService:
                                                percents=[0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2]):
         last_trade_date = trade_date
         logging.info("现在计算%s的vol surface" % instrument)
-        quote_close_instrument = QuoteCloseService.get_instrument_quote_close_list_by_period(db_session, instrument, last_trade_date, last_trade_date, is_primary=True)[0]
+        quote_close_instrument = \
+        QuoteCloseService.get_instrument_quote_close_list_by_period(db_session, instrument, last_trade_date,
+                                                                    last_trade_date, is_primary=True)[0]
         instrument = InstrumentRepo.get_instrument(db_session, instrument)
         if not quote_close_instrument:
             raise Exception(
@@ -100,7 +113,6 @@ class OtcModelService:
 
         if strike_type is None:
             strike_type = VolSurfaceStrikeType.PERCENT
-
 
         if strike_type == VolSurfaceStrikeType.PERCENT:
             # 根据 percentage 计算vor grid
@@ -114,18 +126,27 @@ class OtcModelService:
         end_date = last_trade_date
         default_windows = [44, 66, 132]
         default_percentiles = [50]
-        realised_vol_dto_list, realised_vol_log = HistoricalVolService.calc_instrument_realized_vol(db_session, instrument_id, last_trade_date,
-                                                                    [1, 3, 5, 10, 22], contract_order)
+        realised_vol_dto_list, realised_vol_log = HistoricalVolService.calc_instrument_realized_vol(db_session,
+                                                                                                    instrument_id,
+                                                                                                    last_trade_date,
+                                                                                                    [1, 3, 5, 10, 22],
+                                                                                                    contract_order)
         if realised_vol_log:
             logging.warning(realised_vol_log)
         realised_vol = {}
         for item in realised_vol_dto_list:
             realised_vol[item.window] = item.vol
-        rolling_vol_dto_list, rolling_vol_log = HistoricalVolService.calc_instrument_rolling_vol(db_session, instrument_id, start_date, end_date, 22, contract_order)
+        rolling_vol_dto_list, rolling_vol_log = HistoricalVolService.calc_instrument_rolling_vol(db_session,
+                                                                                                 instrument_id,
+                                                                                                 start_date, end_date,
+                                                                                                 22, contract_order)
         if rolling_vol_log:
             logging.warning(rolling_vol_log)
-        vol_cone_dto_list, vol_cone_log = HistoricalVolService.calc_instrument_vol_cone(db_session, instrument_id, start_date, end_date, default_windows,
-                                                            default_percentiles, contract_order)
+        vol_cone_dto_list, vol_cone_log = HistoricalVolService.calc_instrument_vol_cone(db_session, instrument_id,
+                                                                                        start_date, end_date,
+                                                                                        default_windows,
+                                                                                        default_percentiles,
+                                                                                        contract_order)
         if vol_cone_log:
             logging.warning(vol_cone_log)
         vol_cone = {}
@@ -134,7 +155,7 @@ class OtcModelService:
             for vol_item in item.vols:
                 vol_cone[item.window][vol_item.percentile] = vol_item.vol
         # 按日期从小到大排序
-        rolling_vol_list = [item.vol for item in sorted(rolling_vol_dto_list, key=lambda x:x.tradeDate, reverse=True)]
+        rolling_vol_list = [item.vol for item in sorted(rolling_vol_dto_list, key=lambda x: x.tradeDate, reverse=True)]
         vol_surface = {
             '2W': (realised_vol[1] * 40 + realised_vol[3] * 20 + realised_vol[5] * 20 + realised_vol[10] * 10 +
                    realised_vol[22] * 10) / 100,
@@ -173,7 +194,6 @@ class OtcModelService:
             dto_vol_grid.tenor = tenor
             dto_vol_grid.vols = [x.vols for x in dto_vol_grids if x.tenor == tenor][0]
             dto_vol_grid_list.append(dto_vol_grid)
-
 
         dto_model_info.instruments = dto_vol_grid_list
         dto_vol_surface.model_name = 'TRADER_VOL'
@@ -224,13 +244,14 @@ class WingModelService:
     @staticmethod
     # 大宗入口
     def calc_commodity_vol_surface(db_session, contract_type, observed_date, start_strike=None,
-                                   end_strike=None, point_num=10, step=None, strike_type=None, days_in_year=365, calendar_name=None):
+                                   end_strike=None, point_num=10, step=None, strike_type=None, days_in_year=365,
+                                   calendar_name=None):
         if contract_type:
             underlyers = OptionStructureRepo.get_underlyers_by_contract_type(db_session, contract_type, observed_date)
             if underlyers:
                 return WingModelService.get_wing_model(db_session, underlyers, observed_date, contract_type,
                                                        start_strike, end_strike, point_num, step,
-                                                       strike_type,days_in_year, calendar_name)
+                                                       strike_type, days_in_year, calendar_name)
         else:
             return None
 
@@ -241,10 +262,10 @@ class WingModelService:
         return WingModelService.get_wing_model(db_session, [underlyer], observed_date, underlyer, start_strike,
                                                end_strike, point_num, step, strike_type, days_in_year, calendar_name)
 
-
     @staticmethod
     def get_wing_model(db_session, underlyer_list, observed_date, contract_type,
-                       start_strike=None, end_strike=None, point_num=10, step=None, strike_type=None, days_in_year=365, calendar_name=None):
+                       start_strike=None, end_strike=None, point_num=10, step=None, strike_type=None, days_in_year=365,
+                       calendar_name=None):
         try:
             spots_dict = {}
             holidays = TradingCalendarRepo.get_holiday_list(db_session, calendar_name=calendar_name)
@@ -276,7 +297,8 @@ class WingModelService:
                 for expiry, value in origin.items():
                     dto_vol_grid = VolGridItemDTO()
                     # expire time
-                    dto_vol_grid.tenor = str(DateTimeUtils.get_effective_days_num(observed_date, expiry, holidays)) + 'D'
+                    dto_vol_grid.tenor = str(
+                        DateTimeUtils.get_effective_days_num(observed_date, expiry, holidays)) + 'D'
                     dto_vol_grid.expiry = expiry
                     dto_vol_grid.vols = []
                     vol_set = []
@@ -321,10 +343,10 @@ class WingModelDataService:
 
     @staticmethod
     def get_one_option_data(db_session, underlyer, observed_date):
-        option_structure_list = OptionStructureService.get_instrument_option_chain(db_session, underlyer, observed_date, has_dividend=False)
+        option_structure_list = OptionStructureService.get_instrument_option_chain(db_session, underlyer, observed_date,
+                                                                                   has_dividend=False)
         option_dto_list = WingModelRepo.get_option_close(db_session, underlyer, observed_date, option_structure_list)
         return option_dto_list
-
 
     @staticmethod
     def get_all_close_price(db_session, underlyer_list, observed_date):

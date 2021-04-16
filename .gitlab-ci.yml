@@ -1,0 +1,56 @@
+stages:
+  - code
+  - build
+  - test
+  - deploy
+  
+variables:
+  SONAR_URL: http://10.1.5.11:9000
+  SONAR_LOGIN: a82b3a43f3891d8af3c01a945ff9ab0a6e8cbdaf
+  START: 开始部署
+  FINISH: 部署完毕
+  
+sonarqube_preview_feature_job:
+  tags:
+  - push_ci
+  stage: code
+  only:
+    - /^feature\/*/
+    - master-staging
+  script:
+    - git checkout origin/master-staging-jkzx
+    - git merge $CI_COMMIT_SHA --no-commit --no-ff
+    - ./gradlew --no-daemon sonarqube -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
+sonarqube_master_job:
+  tags:
+  - release_ci
+  stage: code
+  only:
+    - /^release\/*/
+    - /^qa\/*/
+  script:
+    - ./gradlew --no-daemon cobertura
+    - ./gradlew --no-daemon sonarqube -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN  -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+    
+build_job:
+  tags:
+  - push_ci
+  stage: build
+  script:
+  - ./gradlew --no-daemon --parallel clean build
+  - ./gradlew --no-daemon installLocal smokeTest
+  except:
+  - web
+  
+
+deploy_job:
+  tags:
+  - dev_ci
+  stage: deploy
+  script:
+  - ./scripts/ci/greet.sh $CI_RUNNER_DESCRIPTION $START
+  - ./gradlew --no-daemon clean build installLocal deploy copyScripts -P branch=$CI_COMMIT_REF_NAME
+  - ./scripts/ci/greet.sh $CI_RUNNER_DESCRIPTION $FINISH 
+  only:
+  - web

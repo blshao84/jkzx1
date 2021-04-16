@@ -3,47 +3,18 @@ import math
 import os
 import uuid
 import csvdiff
-import sqlalchemy
 import json
-from config.bct_config import pg_url
 from terminal import Logging
-import pandas as pd
-import numpy as np
+import chardet
 
 logging = Logging.getLogger(__name__)
 
 
-class RegressionResultTable:
-    table_name: str
-    key_columns: list
-    value_columns: list
-
-    def __init__(self, db_name, name, keys, values, roundings={}):
-        url = pg_url + '/' + db_name
-        engine = sqlalchemy.create_engine(url)
-        self.db = engine.connect()
-        self.table_name = name
-        self.key_columns = keys
-        self.value_columns = values
-        self.roundings = roundings
-
-    def reg_result_sql(self):
-        columns = self.key_columns + self.value_columns
-        sql = 'select ' + ','.join(columns) + ' from ' + self.table_name
-        logging.info('reg result SQL:%s' % sql)
-        return sql
-
-    def reg_result_dataframe(self):
-        sql = self.reg_result_sql()
-        df = pd.read_sql(sql, self.db)
-        return df.round(self.roundings)
-
-
 def write_to_csv(name, data):
-    file_name = name + '.csv'
+    file_name = name.replace(':', '_') + '.csv'
     keys = data[0].keys()
     logging.info('write data to csv file %s' % file_name)
-    with open(file_name, 'w', newline='') as output_file:
+    with open(file_name, 'w', newline='', encoding='utf8') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(data)
@@ -96,7 +67,12 @@ def db_to_record(tbl):
 
 
 def file_to_record(path):
-    with open(path) as f:
+    # get file's encoding
+    tmp_file = open(path, mode='rb')
+    data = tmp_file.read()
+    encoding = chardet.detect(data)["encoding"]
+    logging.info('file:%s encoding is %s' % (tmp_file.name, encoding))
+    with open(path, encoding=encoding) as f:
         rows = [{k: v for k, v in row.items()}
                 for row in csv.DictReader(f, skipinitialspace=True)]
         return rows
@@ -104,7 +80,7 @@ def file_to_record(path):
 
 def bas_to_record(test_name, table_name):
     cur_path = os.path.dirname(os.path.realpath(__file__))
-    path = os.path.join(cur_path, 'bas', test_name, table_name + '.csv')
+    path = os.path.join(cur_path, 'bas', test_name, table_name.replace(':', '_') + '.csv')
     rows = file_to_record(path)
     return table_name, rows
 
@@ -145,17 +121,19 @@ class RegressionTestCase:
                                      list(map(lambda k: k.replace('"', ''), tbl.key_columns))),
                         self.result_tables))
 
-    def run(self, dump: bool):
+    def run(self, dump: bool, dry_run=False):
         self.test_run()
-        if dump:
-            self.dump_result()
-        else:
-            bas = self.bas_result()
-            reg = self.reg_result()
-            keys_map = self.table_keys()
-            for bas_name in bas:
-                bas_values = bas[bas_name]
-                keys = keys_map[bas_name]
-                reg_values = reg[bas_name]
-                diff = csvdiff.diff_records(bas_values, reg_values, keys)
-                assert_results(diff, bas_name)
+        if not dry_run:
+            if dump:
+                self.dump_result()
+            else:
+                bas = self.bas_result()
+                reg = self.reg_result()
+                keys_map = self.table_keys()
+                for bas_name in bas:
+                    bas_values = bas[bas_name]
+                    keys = keys_map[bas_name]
+                    reg_values = reg[bas_name]
+                    diff = csvdiff.diff_records(bas_values, reg_values, keys)
+                    assert_results(diff, bas_name)
+

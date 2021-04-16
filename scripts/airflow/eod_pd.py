@@ -3,6 +3,8 @@
 from datetime import datetime
 from json import JSONEncoder, JSONDecoder
 
+from tabulate import tabulate
+
 from report import basic_positions_pd, basic_risks_pd, basic_listed_positions_pd, basic_cashflows_pd, \
     basic_otc_company_type, basic_instrument_contract_type
 from report.eod import eod_position_report_pd, eod_market_risk_summary_report_pd, eod_market_risk_detail_report_pd, \
@@ -106,6 +108,7 @@ def basic_risks_pd_run(pricing_environment, valuation_date):
     position = pd.read_msgpack(position_result)
     if not position.empty:
         risk = basic_risks_pd.get_risks(position, pricing_environment, valuation_date, data_resource_ip, headers)
+        # print(tabulate(risk, headers='keys', tablefmt='psql'))
         risk_result = risk.to_msgpack(compress='zlib')
         r.set(EOD_BASIC_RISKS_ + pricing_environment.lower(), risk_result)
         print('Basic Risk Pd Data In ' + pricing_environment + ' Has Save To Redis')

@@ -11,20 +11,24 @@ if [ "$1" == "local" ]
     ./start_db_fresh.sh
     cat regression_trades.sql  | docker exec -i bct-postgresql psql -U bct
     cat regression_quotes.sql  | docker exec -i bct-postgresql psql -U bct
-    cd "$ROOT_PATH" || exit
-    pm2 start regression.config.js
   else
     echo "use set up db"
+    cat schemas.sql | psql -U bct
+    cat regression_trades.sql  | psql -U bct
+    cat regression_quotes.sql | psql -U bct
 fi
-for (( c=1; c<=60; c++ ))
-do  
-   echo "check server status: $c"
-   pm2 list
-   pm2 log
-   sleep 1
-done
+cd "$ROOT_PATH" || exit
+pm2 start regression.config.js
+sleep 60
+export BCT_PORT="16016"
 export PYTHONPATH="$MINIMUM_PATH"
 python "$MINIMUM_PATH"/init_regression.py
 export PYTHONPATH="$AIRFLOW_PATH"
 export TERMINAL_ENV=regression
 python "$AIRFLOW_PATH"/regression/f2b_regression.py
+rc=$?
+if [[ $rc != 0 ]]
+  then
+    pm2 log --nostream --lines 500
+    exit $rc;
+fi
