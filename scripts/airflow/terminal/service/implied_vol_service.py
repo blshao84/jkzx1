@@ -109,12 +109,12 @@ class ImpliedVolService:
 
         # model_info
         model_info_schema = VolSurfaceModelInfoSchema()
-        model_info = model_info_schema.load(dbo.modelInfo).data
+        model_info = model_info_schema.load(dbo.modelInfo)
         dto.modelInfo = model_info
 
         # fitting model
         fitting_model_schema = FittingModelSchema(many=True)
-        fitting_model_list = fitting_model_schema.load(dbo.fittingModels).data
+        fitting_model_list = fitting_model_schema.load(dbo.fittingModels)
         dto.fittingModels = fitting_model_list
         dto.updatedAt = dbo.updatedAt
         return dto
