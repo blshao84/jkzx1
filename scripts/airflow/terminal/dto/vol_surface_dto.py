@@ -19,7 +19,7 @@ class VolItemSchema(BaseSchema):
     label = fields.Str(missing=None)
 
     @post_load
-    def make_vol_item(self, dic, pass_many=False, pass_original=False):
+    def make_vol_item(self, dic, many=None, partial=None):
         return VolItemDTO(**dic)
 
 
@@ -38,7 +38,7 @@ class VolGridItemSchema(BaseSchema):
     vols = fields.Nested(VolItemSchema, many=True, missing=None)
 
     @post_load
-    def make_vol_grid_item(self, dic, pass_many=False, pass_original=False):
+    def make_vol_grid_item(self, dic, many=None, partial=None):
         return VolGridItemDTO(**dic)
 
 
@@ -58,7 +58,7 @@ class VolSurfaceUnderlyerSchema(BaseSchema):
     quote = fields.Float(missing=None)
 
     @post_load
-    def make_underlyer_item(self, dic, pass_many=False, pass_original=False):
+    def make_underlyer_item(self, dic, many=None, partial=None):
         return VolSurfaceUnderlyerDTO(**dic)
 
 
@@ -84,7 +84,7 @@ class VolSurfaceModelInfoSchema(BaseSchema):
     instruments = fields.Nested(VolGridItemSchema, many=True, missing=None)
 
     @post_load
-    def make_vol_surface_model_item(self, dic, pass_many=False, pass_original=False):
+    def make_vol_surface_model_item(self, dic, many=None, partial=None):
         return VolSurfaceModelInfoDTO(**dic)
 
 
@@ -125,7 +125,7 @@ class FittingModelSchema(BaseSchema):
     daysInYear = fields.Int(missing=None)
 
     @post_load
-    def make_fitting_model(self, dic, pass_many=False, pass_original=False):
+    def make_fitting_model(self, dic, many=None, partial=None):
         return FittingModelDTO(**dic)
 
 
@@ -160,7 +160,7 @@ class VolSurfaceSchema(BaseSchema):
     fittingModels = fields.Nested(FittingModelSchema, many=True)
 
     @post_load
-    def make_vol_surface_item(self, dic, pass_many=False, pass_original=False):
+    def make_vol_surface_item(self, dic, many=None, partial=None):
         return VolSurfaceDTO(**dic)
 
 

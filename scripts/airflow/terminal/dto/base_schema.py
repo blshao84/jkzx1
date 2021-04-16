@@ -28,5 +28,5 @@ class BaseSchema(Schema):
     #     return self.convert_snake_case_keys(data)
 
     @pre_load
-    def pre(self, data, pass_many=False):
+    def pre(self, data, many=None, partial=None):
         return self.convert_snake_case_keys(data)
