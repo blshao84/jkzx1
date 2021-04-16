@@ -183,7 +183,7 @@ bct_otc_custom_postions = RegressRedisJsonObjectListResult(
             'pricingEnvironment'],
     roundings={'underlyerMultiplier': 0, 'price': 4, 'gamma': 4, 'vega': 4, 'theta': 4, 'underlyerPrice': 4, 'r': 4,
                'q': 4, 'vol': 4, 'daysInYear': 0, 'marketValue': 4, 'number': 4, 'deltaCash': 4, 'gammaCash': 4,
-               'rho': 4, 'deltaDecay': 4, 'deltaWithDecay': 4}
+               'rho': 4, 'deltaDecay': 4, 'deltaWithDecay': 4, 'delta': 4}
 )
 
 bct_otc_position_map = RegressionRedisDictListResult(
