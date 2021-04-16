@@ -119,7 +119,9 @@ termcolor==1.1.0
 text-unidecode==1.2
 thrift==0.11.0
 tornado==5.1.1
-tornado-sqlalchemy==0.6.1
+
+tornado-sqlalch
+emy==0.6.1
 typing==3.7.4.1
 typing-extensions==3.7.4.1
 tzlocal==1.5.1
