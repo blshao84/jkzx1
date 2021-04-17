@@ -48,10 +48,7 @@ class UpdateAllVolSurfaceTest(RegressionTestCase):
             value_dict[key] = value.get(key)
 
         model_info = literal_eval(value.get('model_info'))
-        if isinstance(model_info, list):
-            value_dict.update(model_info[0])
-        else:
-            value_dict.update(model_info)
+        value_dict.update(model_info)
 
         roundings = {}
         for k, v in vol_surface.roundings.items():
