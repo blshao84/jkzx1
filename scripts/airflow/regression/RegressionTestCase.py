@@ -137,3 +137,14 @@ class RegressionTestCase:
                     diff = csvdiff.diff_records(bas_values, reg_values, keys)
                     assert_results(diff, bas_name)
 
+    def dfs_rounding(self, obj, keys, key_idx, rounding):
+        key = keys[key_idx]
+        if key_idx == len(keys) - 1:
+            obj[key] = round(obj[key], rounding)
+            return
+
+        if type(obj[key]) == list:
+            for item in obj[key]:
+                self.dfs_rounding(item, keys, key_idx + 1, rounding)
+        else:
+            self.dfs_rounding(obj[key], keys, key_idx + 1, rounding)

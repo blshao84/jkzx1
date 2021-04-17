@@ -58,17 +58,5 @@ class UpdateAllVolSurfaceTest(RegressionTestCase):
             if k.startswith('model_info.'):
                 roundings[k.replace('model_info.', '')] = v
         for k, v in roundings.items():
-            self.dfs(value_dict, k.split('.'), 0, v)
+            self.dfs_rounding(value_dict, k.split('.'), 0, v)
         return value_dict
-
-    def dfs(self, obj, keys, key_idx, rounding):
-        key = keys[key_idx]
-        if key_idx == len(keys) - 1:
-            obj[key] = round(obj[key], rounding)
-            return
-
-        if type(obj[key]) == list:
-            for item in obj[key]:
-                self.dfs(item, keys, key_idx + 1, rounding)
-        else:
-            self.dfs(obj[key], keys, key_idx + 1, rounding)
