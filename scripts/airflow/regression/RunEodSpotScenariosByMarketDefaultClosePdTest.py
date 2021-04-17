@@ -43,15 +43,12 @@ class RunEodSpotScenariosByMarketDefaultClosePdTest(RegressionTestCase):
             value_dict[key] = value.get(key)
 
         scenarios = literal_eval(value.get('scenarios'))
-        if isinstance(scenarios, list):
-            value_dict.update(scenarios[0])
-        else:
-            value_dict.update(scenarios)
-
-        roundings = {}
+        scenarios_roundings = {}
         for k, v in spot_scenarios_report.roundings.items():
             if k.startswith('scenarios.'):
-                roundings[k.replace('scenarios.', '')] = v
-        for k, v in roundings.items():
-            self.dfs_rounding(value_dict, k.split('.'), 0, v)
+                scenarios_roundings[k.replace('scenarios.', '')] = v
+        for k, v in scenarios_roundings.items():
+            for scenario in scenarios:
+                self.dfs_rounding(scenario, k.split('.'), 0, v)
+        value_dict['scenarios'] = scenarios
         return value_dict
